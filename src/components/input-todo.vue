@@ -12,11 +12,13 @@
         add
       </button>
     </div>
+    <div v-if="isLoading">loading...</div>
+    <div class="error" v-if="isError">Error</div>
   </div>
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapActions, mapGetters } from "vuex";
 import {getTodos} from '@/utils/supabase'
 export default {
   data() {
@@ -24,12 +26,17 @@ export default {
       todo: "",
     };
   },
+  computed:{
+    ...mapGetters(["isLoading","isError"])
+  },
   methods: {
     ...mapActions(["addTodo"]),
     handleClick(e) {
       e.preventDefault();
-      this.addTodo(this.todo);
-      this.todo = "";
+      this.addTodo(this.todo)
+      .then(()=>{
+          this.todo = "";
+      });
     },
   },
   async mounted() {
@@ -39,4 +46,9 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+
+.error {
+    color: red;
+}
+</style>

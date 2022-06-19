@@ -15,12 +15,12 @@ export const getTodos = async () => {
 
 export const addTodoSupa = async (title) => {
   let todo = { title, done: false };
-  try {
-    const { data } = await supabase.from("todos").insert([todo]);
-    console.log("response add todo supe", data);
+  const { data, error } = await supabase.from("todos").insert([todo]);
+  console.log("response add todo supe1", data, error);
+  if (!data) {
+    throw error;
+  } else {
     return data;
-  } catch (error) {
-    console.error(error);
   }
 };
 
@@ -39,12 +39,9 @@ export const updateTodoSupa = async (todo) => {
 
 export const deleteTodoSupa = async (id) => {
   try {
-    const { data } = await supabase
-      .from("todos")
-      .delete()
-      .eq("id", id);
-      console.log('delete supa', id)
-      return data;
+    const { data } = await supabase.from("todos").delete().eq("id", id);
+    console.log("delete supa", id);
+    return data;
   } catch (error) {
     console.error(error);
   }

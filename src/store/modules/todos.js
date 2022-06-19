@@ -1,28 +1,55 @@
-import { addTodoSupa, deleteTodoSupa, getTodos, updateTodoSupa } from "@/utils/supabase";
+import {
+  addTodoSupa,
+  deleteTodoSupa,
+  getTodos,
+  updateTodoSupa,
+} from "@/utils/supabase";
 
 const state = {
   todos: [],
+  isLoading: false,
+  isError: false,
 };
 
 const getters = {
   allTodos: (state) => state.todos,
+  isLoading: (state) => state.isLoading,
+  isError: (state) => state.isError,
 };
 
 const actions = {
   async fetchTodos({ commit }) {
-    const res = await getTodos();
-    commit("setTodos", res);
+    commit("setIsLoading", true);
+    await getTodos()
+      .then((res) => {
+        commit("setIsLoading", false);
+        commit("setTodos", res);
+      })
+      .catch((er) => {
+        console.log(er)
+        commit("setIsError", true);
+      });
   },
   async addTodo({ commit }, title) {
     if (!title) return;
 
-    await addTodoSupa(title);
-
-    commit("addTodo", {
-      id: +new Date(),
-      title,
-      done: false,
-    });
+    commit("setIsLoading", true);
+    commit("setIsError", false);
+    await addTodoSupa(title)
+      .then(() => {
+        commit("setIsLoading", false);
+        commit("addTodo", {
+          id: +new Date(),
+          title,
+          done: false,
+        });
+      })
+      .catch((error) => {
+        console.log('error outer')
+        commit("setIsError", true);
+        commit("setIsLoading", false);
+        throw error;
+      });
   },
   async removeTodo({ commit }, id) {
     await deleteTodoSupa(id);
@@ -44,6 +71,8 @@ const mutations = {
     if (index === -1) return;
     state.todos.splice(index, 1, todo);
   },
+  setIsLoading: (state, isLoading) => (state.isLoading = isLoading),
+  setIsError: (state, isError) => (state.isError = isError),
 };
 
 export default {
