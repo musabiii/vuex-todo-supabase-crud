@@ -25,8 +25,7 @@ const actions = {
         commit("setIsLoading", false);
         commit("setTodos", res);
       })
-      .catch((er) => {
-        console.log(er)
+      .catch(() => {
         commit("setIsError", true);
       });
   },
@@ -45,19 +44,26 @@ const actions = {
         });
       })
       .catch((error) => {
-        console.log('error outer')
         commit("setIsError", true);
         commit("setIsLoading", false);
         throw error;
       });
   },
   async removeTodo({ commit }, id) {
-    await deleteTodoSupa(id);
-    commit("removeTodo", id);
+    await deleteTodoSupa(id)
+    .then(() => {
+      commit("removeTodo", id);
+    });
   },
   async updateTodo({ commit }, todo) {
-    await updateTodoSupa(todo);
     commit("updateTodo", todo);
+    await updateTodoSupa(todo)
+    .then(() => {
+    })
+    .catch((error) => {
+      commit("updateTodo", {...todo,done:!todo.done});
+      console.log(error)
+    });
   },
 };
 

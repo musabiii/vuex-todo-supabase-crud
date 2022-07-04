@@ -4,7 +4,7 @@
       <input
         class="form-check-input mt-0"
         type="checkbox"
-        :value="todo.done"
+        :checked="todo.done"
         :id="todo.id"
         role="button"
         @change.prevent="handleChange"
@@ -16,7 +16,7 @@
         role="button"
         type="button"
         class="btn-close"
-        @click="handleDel"
+        @click.prevent="handleDel"
       ></button>
     </li>
   </div>
@@ -33,8 +33,7 @@ export default {
   },
   methods: {
     ...mapActions(["removeTodo", "updateTodo"]),
-    handleDel(e) {
-      e.preventDefault();
+    handleDel() {
       this.removeTodo(this.todo.id);
     },
     handleChange() {
